@@ -2,8 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Mail\WelcomeUserMail;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Mail;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
@@ -12,6 +14,8 @@ class AuthTest extends TestCase
 
     public function test_user_can_register(): void
     {
+        Mail::fake();
+
         $response = $this->postJson('/api/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
@@ -28,6 +32,10 @@ class AuthTest extends TestCase
         $this->assertDatabaseHas('users', [
             'email' => 'test@example.com',
         ]);
+
+        Mail::assertQueued(WelcomeUserMail::class, function ($mail) {
+            return $mail->user->email === 'test@example.com';
+        });
     }
 
     public function test_user_can_login(): void
