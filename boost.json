@@ -9,6 +9,7 @@
     "nightwatch_mcp": false,
     "sail": false,
     "skills": [
-        "tailwindcss-development"
+        "tailwindcss-development",
+        "laravel-specialist"
     ]
 }
