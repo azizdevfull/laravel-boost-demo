@@ -9,10 +9,14 @@ use Illuminate\Support\Str;
 
 readonly class UpdatePostDTO
 {
+    /**
+     * @param  array<\Illuminate\Http\UploadedFile>|null  $images
+     */
     public function __construct(
         public ?string $title = null,
         public ?string $slug = null,
         public ?string $content = null,
+        public ?array $images = null,
     ) {}
 
     public static function fromRequest(UpdatePostRequest $request): self
@@ -21,6 +25,7 @@ readonly class UpdatePostDTO
             title: $request->validated('title'),
             slug: $request->has('title') ? Str::slug($request->validated('title')) : null,
             content: $request->validated('content'),
+            images: $request->file('images'),
         );
     }
 

@@ -9,6 +9,7 @@ use App\DTOs\Post\UpdatePostDTO;
 use App\Models\Post;
 use App\Repositories\Contracts\PostRepositoryInterface;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Storage;
 
 class PostService
 {
@@ -45,7 +46,13 @@ class PostService
      */
     public function createPost(CreatePostDTO $dto): Post
     {
-        return $this->postRepository->create($dto->toArray());
+        $post = $this->postRepository->create($dto->toArray());
+
+        if ($dto->images) {
+            $this->uploadImages($post, $dto->images);
+        }
+
+        return $post;
     }
 
     /**
@@ -53,7 +60,13 @@ class PostService
      */
     public function updatePost(Post $post, UpdatePostDTO $dto): Post
     {
-        return $this->postRepository->update($post, $dto->toArray());
+        $updatedPost = $this->postRepository->update($post, $dto->toArray());
+
+        if ($dto->images) {
+            $this->uploadImages($updatedPost, $dto->images);
+        }
+
+        return $updatedPost;
     }
 
     /**
@@ -61,6 +74,27 @@ class PostService
      */
     public function deletePost(Post $post): bool
     {
+        // Delete images from storage
+        foreach ($post->images as $image) {
+            Storage::disk('public')->delete($image->path);
+        }
+
         return $this->postRepository->delete($post);
+    }
+
+    /**
+     * Upload images for a post.
+     *
+     * @param  array<\Illuminate\Http\UploadedFile>  $images
+     */
+    private function uploadImages(Post $post, array $images): void
+    {
+        foreach ($images as $image) {
+            $path = $image->store("posts/{$post->id}", 'public');
+
+            $post->images()->create([
+                'path' => $path,
+            ]);
+        }
     }
 }

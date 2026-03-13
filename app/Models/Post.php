@@ -34,4 +34,14 @@ class Post extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get the images for the post.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\PostImage, \App\Models\Post>
+     */
+    public function images(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(PostImage::class);
+    }
 }

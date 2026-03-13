@@ -29,6 +29,8 @@ class UpdatePostRequest extends FormRequest
         return [
             'title' => ['sometimes', 'required', 'string', 'max:255', 'unique:posts,title,'.$postId],
             'content' => ['sometimes', 'required', 'string'],
+            'images' => ['nullable', 'array'],
+            'images.*' => ['image', 'mimes:jpeg,png,jpg,gif,svg', 'max:2048'],
         ];
     }
 }

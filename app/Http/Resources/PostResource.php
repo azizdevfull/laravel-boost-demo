@@ -25,6 +25,10 @@ class PostResource extends JsonResource
             'title' => $this->resource->title,
             'slug' => $this->resource->slug,
             'content' => $this->resource->content,
+            'images' => $this->resource->images->map(fn ($image) => [
+                'id' => $image->id,
+                'url' => $image->getUrl(),
+            ]),
             'created_at' => $this->resource->created_at,
             'updated_at' => $this->resource->updated_at,
             'user' => new UserResource($this->whenLoaded('user')),

@@ -9,11 +9,15 @@ use Illuminate\Support\Str;
 
 readonly class CreatePostDTO
 {
+    /**
+     * @param  array<\Illuminate\Http\UploadedFile>|null  $images
+     */
     public function __construct(
         public int $userId,
         public string $title,
         public string $slug,
         public string $content,
+        public ?array $images = null,
     ) {}
 
     public static function fromRequest(StorePostRequest $request): self
@@ -23,6 +27,7 @@ readonly class CreatePostDTO
             title: $request->validated('title'),
             slug: Str::slug($request->validated('title')),
             content: $request->validated('content'),
+            images: $request->file('images'),
         );
     }
 
