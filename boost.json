@@ -11,6 +11,7 @@
     "skills": [
         "tailwindcss-development",
         "laravel-best-practices",
-        "laravel-specialist"
+        "laravel-specialist",
+        "phpunit-best-practices"
     ]
 }
