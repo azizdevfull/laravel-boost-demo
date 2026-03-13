@@ -4,20 +4,29 @@ declare(strict_types=1);
 
 namespace Tests\Feature;
 
+use App\Http\Controllers\Api\PostController;
 use App\Models\Post;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\Test;
 use Tests\TestCase;
 
-class PostImageTest extends TestCase
+#[CoversClass(PostController::class)]
+#[Group('posts')]
+#[Group('images')]
+final class PostImageTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_can_create_a_post_with_images(): void
+    #[Test]
+    public function it_can_create_a_post_with_images(): void
     {
+        // Arrange
         Storage::fake('public');
 
         $user = User::factory()->create();
@@ -32,8 +41,10 @@ class PostImageTest extends TestCase
             ],
         ];
 
+        // Act
         $response = $this->postJson('/api/posts', $postData);
 
+        // Assert
         $response->assertStatus(201)
             ->assertJsonPath('data.title', $postData['title'])
             ->assertJsonCount(2, 'data.images');
@@ -50,8 +61,10 @@ class PostImageTest extends TestCase
         }
     }
 
-    public function test_can_add_images_to_existing_post(): void
+    #[Test]
+    public function it_can_add_images_to_existing_post(): void
     {
+        // Arrange
         Storage::fake('public');
 
         $user = User::factory()->create();
@@ -65,22 +78,24 @@ class PostImageTest extends TestCase
             ],
         ];
 
+        // Act
         $response = $this->putJson("/api/posts/{$post->id}", $updateData);
 
+        // Assert
         $response->assertStatus(200)
             ->assertJsonCount(1, 'data.images');
 
         $this->assertDatabaseCount('post_images', 1);
     }
 
-    public function test_images_are_deleted_when_post_is_deleted(): void
+    #[Test]
+    public function it_deletes_images_when_post_is_deleted(): void
     {
+        // Arrange
         Storage::fake('public');
 
         $user = User::factory()->create();
         Sanctum::actingAs($user);
-
-        $post = Post::factory()->create(['user_id' => $user->id]);
 
         $postData = [
             'title' => 'Post to delete',
@@ -97,8 +112,10 @@ class PostImageTest extends TestCase
 
         Storage::disk('public')->assertExists($imagePath);
 
-        // Delete post
+        // Act
         $deleteResponse = $this->deleteJson("/api/posts/{$postId}");
+
+        // Assert
         $deleteResponse->assertStatus(204);
 
         $this->assertDatabaseMissing('posts', ['id' => $postId]);
