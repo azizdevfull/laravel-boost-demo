@@ -29,7 +29,7 @@ class PostController extends Controller
     {
         $posts = $this->postService->getAllPosts();
 
-        return PostResource::collection($posts->load('user'));
+        return PostResource::collection($posts->load(['user', 'images']));
     }
 
     /**
@@ -40,7 +40,7 @@ class PostController extends Controller
         $dto = CreatePostDTO::fromRequest($request);
         $post = $this->postService->createPost($dto);
 
-        return (new PostResource($post))
+        return (new PostResource($post->load('images')))
             ->response()
             ->setStatusCode(201);
     }
@@ -52,7 +52,7 @@ class PostController extends Controller
     {
         $post = $this->postService->getPost($id);
 
-        return new PostResource($post->load('user'));
+        return new PostResource($post->load(['user', 'images']));
     }
 
     /**
@@ -65,7 +65,7 @@ class PostController extends Controller
         $dto = UpdatePostDTO::fromRequest($request);
         $updatedPost = $this->postService->updatePost($post, $dto);
 
-        return new PostResource($updatedPost);
+        return new PostResource($updatedPost->load('images'));
     }
 
     /**
